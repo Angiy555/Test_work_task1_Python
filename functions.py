@@ -88,5 +88,17 @@ def find_notes(file_name: str, atribute: str):
     except FileNotFoundError:
         print('Файла с записями не найдено.')
 
+def recording_changes(file_name: str, data):
+    with open(file_name, 'w', encoding='utf-8') as fd:
+        name_header = ["ID","Дата", "Время", "Заметка"]
+        file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
+        count = 0
+        for note in data:
+            if count == 0:
+                file_writer.writeheader()
+            else:
+                file_writer.writerow({"ID": count,"Дата": note[1], "Время": note[2], "Заметка": note[3]})
+            count += 1
+
 
 

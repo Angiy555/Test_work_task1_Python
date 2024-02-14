@@ -88,17 +88,8 @@ def modify_data(file_name):
         return
     new_notes = input("Введите новую заметку: ")
     file_reader[num][3] = new_notes
-    with open(file_name, 'w', encoding='utf-8') as fd:
-        name_header = ["ID","Дата", "Время", "Заметка"]
-        file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
-        count = 0
-        for note in file_reader:
-            if count == 0:
-                file_writer.writeheader()
-            else:
-                file_writer.writerow({"ID": note[0],"Дата": note[1], "Время": note[2], "Заметка": note[3]})
-            count += 1
-        print("\n Запись изменена!")
+    recording_changes(file_name, file_reader)
+    print("\n Запись изменена!")
 
 def remove_data(file_name):
     """
@@ -119,14 +110,5 @@ def remove_data(file_name):
     if num == 0:
         return
     file_reader.pop(num)
-    with open(file_name, 'w', encoding='utf-8') as fd:
-        name_header = ["ID","Дата", "Время", "Заметка"]
-        file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
-        count = 0
-        for note in file_reader:
-            if count == 0:
-                file_writer.writeheader()
-            else:
-                file_writer.writerow({"ID": count,"Дата": note[1], "Время": note[2], "Заметка": note[3]})
-            count += 1
-        print("\n Запись удалена!")
+    recording_changes(file_name, file_reader)
+    print("\n Запись удалена!")
