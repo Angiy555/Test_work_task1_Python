@@ -89,6 +89,9 @@ def find_notes(file_name: str, atribute: str):
         print('Файла с записями не найдено.')
 
 def recording_changes(file_name: str, data):
+    """
+    Функция сохранения изменений в файле
+    """
     with open(file_name, 'w', encoding='utf-8') as fd:
         name_header = ["ID","Дата", "Время", "Заметка"]
         file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)

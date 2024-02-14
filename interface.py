@@ -45,7 +45,7 @@ def add_new(file_name: str):
 
 def show_all(file_name: str):
     """
-    Функция принимает имя файла  (file_name) в иде строки
+    Функция принимает имя файла  (file_name) в виде строки
     и выводит заметки на экран
     """
     try:
