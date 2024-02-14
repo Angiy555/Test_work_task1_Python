@@ -45,7 +45,7 @@ def print_data(data):
 
     print(split_line)
 
-def format_verification(atribute: str):
+def is_format_verification(atribute: str):
     """
     Функция проверки формата даты
     """
@@ -55,19 +55,7 @@ def format_verification(atribute: str):
     except ValueError:
         return False
 
-def find(date, atribute: str):
-    """
-    Функция поиска по дате
-    """
-    find_notes = []
-    find_notes.append({"ID","Дата", "Время", "Заметка"})
-    for notes in date:
-        if notes[1] == atribute:
-            find_notes.append(notes)
-
-    return find_notes
-
-def num_format_ver(count, num: str):
+def is_num_format_ver(count, num: str):
     """
     Функция проверки числа в диапазоне
     """
@@ -79,3 +67,26 @@ def num_format_ver(count, num: str):
             return False
     except ValueError:
         return False
+
+def find_notes(file_name: str, atribute: str):
+    """
+    Функция поиска по дате
+    """
+    try:
+        with open(file_name, 'r',encoding='utf-8') as fd:
+            file_reader = list(csv.reader(fd, delimiter=";"))
+            find_notes = []
+            find_notes.append({"ID","Дата", "Время", "Заметка"})
+            for notes in file_reader:
+                if notes[1] == atribute:
+                    find_notes.append(notes)
+            if len(find_notes) < 2:
+                print('Такой записи нет в заметках')
+                return
+            print_data(find_notes)
+            return file_reader
+    except FileNotFoundError:
+        print('Файла с записями не найдено.')
+
+
+

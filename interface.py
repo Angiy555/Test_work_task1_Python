@@ -62,19 +62,10 @@ def find_by_atribute(file_name:str):
     """
     atribute = input("Введите дату искомой заметки (гггг-мм-дд): ")
     print()
-    if format_verification(atribute):
-        try:
-            with open(file_name, 'r',encoding='utf-8') as fd:
-                file_reader = csv.reader(fd, delimiter=";")
-                find_reader = find(file_reader, atribute)
-                if len(find_reader) > 1:
-                    print_data(find_reader)
-                else:
-                    print('Такой записи нет в заметках')
-        except FileNotFoundError:
-            print('Файла с записями не найдено.')
-    else:
+    if not is_format_verification(atribute):
         print("Введен не верный формат даты")
+        return
+    find_notes(file_name, atribute)
 
 def modify_data(file_name):
     """
@@ -84,39 +75,30 @@ def modify_data(file_name):
     """
     atribute = input("Введите дату искомой заметки (гггг-мм-дд): ")
     print()
-    if not format_verification(atribute):
+    if not is_format_verification(atribute):
         print("Введен не верный формат даты")
         return
-    try:
-        with open(file_name, 'r',encoding='utf-8') as fd:
-            file_reader = list(csv.reader(fd, delimiter=";"))
-            find_reader = find(file_reader, atribute)
-            if len(find_reader) < 2:
-                print('Такой записи нет в заметках')
-                return
-            print_data(find_reader)
-            num_notes = input('Введите ID записи или 0 для выхода: ')
-            if not num_format_ver(len(file_reader),num_notes):
-                print("Введен не верный ID!")
-                return
-            num = int(num_notes)
-            if num == 0:
-                return
-            new_notes = input("Введите новую заметку: ")
-            file_reader[num][3] = new_notes
-            with open(file_name, 'w', encoding='utf-8') as fd:
-                name_header = ["ID","Дата", "Время", "Заметка"]
-                file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
-                count = 0
-                for note in file_reader:
-                    if count == 0:
-                        file_writer.writeheader()
-                    else:
-                        file_writer.writerow({"ID": note[0],"Дата": note[1], "Время": note[2], "Заметка": note[3]})
-                    count += 1
-                print("\n Запись изменена!")
-    except FileNotFoundError:
-        print('Файла с записями не найдено.')
+    file_reader = find_notes(file_name, atribute)
+    num_notes = input('Введите ID записи или 0 для выхода: ')
+    if not is_num_format_ver(len(file_reader),num_notes):
+        print("Введен не верный ID!")
+        return
+    num = int(num_notes)
+    if num == 0:
+        return
+    new_notes = input("Введите новую заметку: ")
+    file_reader[num][3] = new_notes
+    with open(file_name, 'w', encoding='utf-8') as fd:
+        name_header = ["ID","Дата", "Время", "Заметка"]
+        file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
+        count = 0
+        for note in file_reader:
+            if count == 0:
+                file_writer.writeheader()
+            else:
+                file_writer.writerow({"ID": note[0],"Дата": note[1], "Время": note[2], "Заметка": note[3]})
+            count += 1
+        print("\n Запись изменена!")
 
 def remove_data(file_name):
     """
@@ -125,35 +107,26 @@ def remove_data(file_name):
     """
     atribute = input("Введите дату искомой заметки (гггг-мм-дд): ")
     print()
-    if not format_verification(atribute):
+    if not is_format_verification(atribute):
         print("Введен не верный формат даты")
         return
-    try:
-        with open(file_name, 'r',encoding='utf-8') as fd:
-            file_reader = list(csv.reader(fd, delimiter=";"))
-            find_reader = find(file_reader, atribute)
-            if len(find_reader) < 2:
-                print('Такой записи нет в заметках')
-                return
-            print_data(find_reader)
-            num_notes = input('Введите ID записи для удаления или 0 для выхода: ')
-            if not num_format_ver(len(file_reader),num_notes):
-                print("Введен не верный ID!")
-                return
-            num = int(num_notes)
-            if num == 0:
-                return
-            file_reader.pop(num)
-            with open(file_name, 'w', encoding='utf-8') as fd:
-                name_header = ["ID","Дата", "Время", "Заметка"]
-                file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
-                count = 0
-                for note in file_reader:
-                    if count == 0:
-                        file_writer.writeheader()
-                    else:
-                        file_writer.writerow({"ID": count,"Дата": note[1], "Время": note[2], "Заметка": note[3]})
-                    count += 1
-                print("\n Запись удалена!")
-    except FileNotFoundError:
-        print('Файла с записями не найдено.')
+    file_reader = find_notes(file_name, atribute)
+    num_notes = input('Введите ID записи для удаления или 0 для выхода: ')
+    if not is_num_format_ver(len(file_reader),num_notes):
+        print("Введен не верный ID!")
+        return
+    num = int(num_notes)
+    if num == 0:
+        return
+    file_reader.pop(num)
+    with open(file_name, 'w', encoding='utf-8') as fd:
+        name_header = ["ID","Дата", "Время", "Заметка"]
+        file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
+        count = 0
+        for note in file_reader:
+            if count == 0:
+                file_writer.writeheader()
+            else:
+                file_writer.writerow({"ID": count,"Дата": note[1], "Время": note[2], "Заметка": note[3]})
+            count += 1
+        print("\n Запись удалена!")
