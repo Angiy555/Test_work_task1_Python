@@ -13,102 +13,106 @@ def draw_interface ():
     print('########            МЕНЮ            #########')
     print(split_line)
     print('1 - Показать список заметок')
-    print('2 - Добавить добавить заметку')
+    print('2 - Добавить заметку')
     print('3 - Поиск заметки по дате')
     print('4 - Редактировать заметку')
     print('5 - Удалить заметку')
     print('0 - Выход из программы')
     print(split_line)
 
-def add_new(file_name: str):
+
+def add_new_note():
     """
-    Функция принимает имя файла  (file_name) в виде строки
-    запрашивает у пользователя данные
+    Функция запрашивает у пользователя заметку и сохраняет ее в файл
     """
     text_notes = input('Введите текст заметки:\n')
     current_date_time = datetime.datetime.now()
     notes_date = current_date_time.date()
     notes_time = current_date_time.time()
-    count = count_notes(file_name)
+    notes_list= []
 
-    #Открытие файла и запись в него данных в конце файла
-    name_header = ["ID","Дата", "Время", "Заметка"]
     if(os.path.isfile(file_name)):
-        with open(file_name, 'a', encoding='utf-8') as fd:
-            file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
-            file_writer.writerow({"ID": count,"Дата": notes_date, "Время": notes_time, "Заметка": text_notes})
+        notes_list = reader_notes_from_file()
+        max_ID = search_maximum_ID(notes_list)
+        notes_list.append([max_ID + 1, notes_date, notes_time, text_notes])
+        writer_note_to_file(notes_list)
     else:
-        with open(file_name, 'a', encoding='utf-8') as fd:
-            file_writer = csv.DictWriter(fd, delimiter=";", lineterminator="\r", fieldnames=name_header)
-            file_writer.writeheader()
-            file_writer.writerow({"ID": count + 1,"Дата": notes_date, "Время": notes_time, "Заметка": text_notes})
+        notes_list.append([1, notes_date, notes_time, text_notes])
+        writer_note_to_file(notes_list)
 
-def show_all(file_name: str):
+
+def show_all():
     """
-    Функция принимает имя файла  (file_name) в виде строки
-    и выводит заметки на экран
+    Функция выводит заметки на экран
     """
     try:
-        with open(file_name, 'r',encoding='utf-8') as fd:
-            file_reader = csv.reader(fd, delimiter=";")
-            print_data(file_reader)
-    except FileNotFoundError:
+        notes_list = reader_notes_from_file()
+        print_notes_to_console(notes_list)
+    except TypeError:
         print('Файла с записями не найдено.')
 
-def find_by_atribute(file_name:str):
-    """
-    Функция принимает имя файла  (file_name) в виде строки
-    запрашивает атрибут поиска и выводит результат поиска
-    """
-    atribute = input("Введите дату искомой заметки (гггг-мм-дд): ")
-    print()
-    if not is_format_verification(atribute):
-        print("Введен не верный формат даты")
-        return
-    find_notes(file_name, atribute)
 
-def modify_data(file_name):
+def search_note_by_date():
     """
-    Функция принимает имя файла  (file_name) в виде строки
-    выдает список заметок для изменения
-    и запрашивает новые данные
+    Функция запрашивает дату поиска и выводит результат поиска
     """
-    atribute = input("Введите дату искомой заметки (гггг-мм-дд): ")
+    search_date = input("Введите дату искомой заметки (гггг-мм-дд): ")
     print()
-    if not is_format_verification(atribute):
+    if not is_correct_format_date(search_date):
         print("Введен не верный формат даты")
         return
-    file_reader = find_notes(file_name, atribute)
-    num_notes = input('Введите ID записи или 0 для выхода: ')
-    if not is_num_format_ver(len(file_reader),num_notes):
+    notes_list = reader_notes_from_file()
+    found_notes = find_notes_by_date(notes_list, search_date)
+    print_notes_to_console(found_notes)
+
+
+def modify_note():
+    """
+    Функция выдает список заметок для изменения
+    и по выбранному ID записывает новую заметку
+    """
+    search_date = input("Введите дату искомой заметки (гггг-мм-дд): ")
+    print()
+    if not is_correct_format_date(search_date):
+        print("Введен не верный формат даты")
+        return
+    notes_list = reader_notes_from_file()
+    found_notes = find_notes_by_date(notes_list, search_date)
+    print_notes_to_console(found_notes)
+    num_note = input('Введите ID записи или 0 для выхода: ')
+    if not is_correct_format_range_number(notes_list, num_note):
         print("Введен не верный ID!")
         return
-    num = int(num_notes)
+    num = int(num_note)
     if num == 0:
         return
-    new_notes = input("Введите новую заметку: ")
-    file_reader[num][3] = new_notes
-    recording_changes(file_name, file_reader)
+    new_note = input("Введите новую заметку: ")
+    number_line = search_line_number_by_ID(notes_list, num)
+    notes_list[number_line][3] = new_note
+    writer_note_to_file(notes_list)
     print("\n Запись изменена!")
 
-def remove_data(file_name):
+
+def remove_note():
     """
-    Функция принимает имя файла  (file_name) в виде строки
-    выдает список заметок в котором выбирается заметка для удаления
+    Функция выдает список заметок в котором выбирается заметка для удаления
     """
-    atribute = input("Введите дату искомой заметки (гггг-мм-дд): ")
+    search_date = input("Введите дату искомой заметки (гггг-мм-дд): ")
     print()
-    if not is_format_verification(atribute):
+    if not is_correct_format_date(search_date):
         print("Введен не верный формат даты")
         return
-    file_reader = find_notes(file_name, atribute)
-    num_notes = input('Введите ID записи для удаления или 0 для выхода: ')
-    if not is_num_format_ver(len(file_reader),num_notes):
+    notes_list = reader_notes_from_file()
+    found_notes = find_notes_by_date(notes_list, search_date)
+    print_notes_to_console(found_notes)
+    num_note = input('Введите ID записи для удаления или 0 для выхода: ')
+    if not is_correct_format_range_number(notes_list,num_note):
         print("Введен не верный ID!")
         return
-    num = int(num_notes)
+    num = int(num_note)
     if num == 0:
         return
-    file_reader.pop(num)
-    recording_changes(file_name, file_reader)
+    number_line = search_line_number_by_ID(notes_list, num)
+    notes_list.pop(number_line)
+    writer_note_to_file(notes_list)
     print("\n Запись удалена!")
