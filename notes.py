@@ -1,7 +1,5 @@
 import os
 from interface import *
-os.system('CLS')
-
 
 def main():
     """
