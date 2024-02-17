@@ -49,7 +49,7 @@ def show_all():
         notes_list = reader_notes_from_file()
         print_notes_to_console(notes_list)
     except TypeError:
-        print('Файла с записями не найдено.')
+        print('')
 
 
 def search_note_by_date():

@@ -15,7 +15,7 @@ def reader_notes_from_file():
             notes_list.pop(0)
             return notes_list
     except FileNotFoundError:
-        print('Файла с записями не найдено.')
+        raise print('Файла с записями не найдено.')
 
 
 def writer_note_to_file(notes_list):
